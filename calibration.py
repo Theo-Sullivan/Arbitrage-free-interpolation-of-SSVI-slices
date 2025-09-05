@@ -231,7 +231,7 @@ def SVI_model_2d_data(IVT_data, plot_IV = True, plot_bidask = False, verbose = F
                 fig.add_trace(go.Scatter(
                     x=logmoneyness_for_graph, y=y_points,
                     mode='markers', name='Market data',
-                    marker=dict(color="#af0d0d", opacity=0.9, size=6, line=dict(width=0.4, color="white"))
+                    marker=dict(color="#e00025", opacity=0.9, size=6, line=dict(width=0.4, color="white"))
                 ))
                 
             fig.add_trace(go.Scatter(

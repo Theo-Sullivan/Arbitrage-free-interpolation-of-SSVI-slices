@@ -1,4 +1,4 @@
-# IMPORTS
+### IMPORTS ###
 
 # Module importsx
 import streamlit as st
@@ -7,6 +7,8 @@ import streamlit as st
 from data_fetch import optchainData, impliedVolSurfaceData_eSSVI
 from calibration import SVI_model_2d_data, interpolation
 
+### UI ELEMENTS ###
+
 st.title("Arbitrage-free interpolation of SSVI slices")
 
 # Heading
@@ -14,7 +16,7 @@ st.sidebar.header('Model Parameters')
 st.sidebar.write('Adjust the parameters and viewing options for the SSVI model')
 
 
-
+# Sidebar
 st.sidebar.header('Ticker and Option Type')
 tickr_ = st.sidebar.text_input( # Choose Tickr
     'Enter Ticker Symbol',
@@ -81,36 +83,44 @@ verbose = False
 tLimit = 0.1
 
 
-try:
-    opt_chain = optchainData(optType_, tickr_, verbose)
-
-except Exception as e:
-    st.error(f"Error fetching option data: {e}")
 
 
-try:
-    IVT_data = impliedVolSurfaceData_eSSVI(optType_, tickr_, opt_chain, plot_bidask = plot_bidask, verbose = verbose, volume_filter = volume_filter, oldmRange = (min_m, max_m), tLimit = 0.1)
+### MAIN ###
+with st.status(label='Fetching option data...', expanded=False) as status:
+    try:
+        opt_chain = optchainData(optType_, tickr_, verbose)
 
-except Exception as e:
-    st.error(f"Error computing IV data: {e}")
+    except Exception as e:
+        st.error(f"Error fetching option data: {e}")
+
+    status.update(label='Computing implied volatility...')
+    try:
+        IVT_data = impliedVolSurfaceData_eSSVI(optType_, tickr_, opt_chain, plot_bidask = plot_bidask, verbose = verbose, volume_filter = volume_filter, oldmRange = (min_m, max_m), tLimit = 0.1)
+
+    except Exception as e:
+        st.error(f"Error computing IV data: {e}")
 
 
-try:
-    if plot2D:  
-        plot_data, figs = SVI_model_2d_data(IVT_data, verbose = verbose, plot = plot2D, plot_bidask = plot_bidask, plot_IV = True)
-    else:
-        plot_data = SVI_model_2d_data(IVT_data, verbose = verbose, plot = plot2D, plot_bidask = plot_bidask, plot_IV = True)
+    status.update(label='Calibrating parameters...')
+    try:
+        if plot2D:  
+            plot_data, figs = SVI_model_2d_data(IVT_data, verbose = verbose, plot = plot2D, plot_bidask = plot_bidask, plot_IV = True)
+        else:
+            plot_data = SVI_model_2d_data(IVT_data, verbose = verbose, plot = plot2D, plot_bidask = plot_bidask, plot_IV = True)
 
-except Exception as e:
-    st.error(f"Error calibrating SSVI slices: {e}")
+    except Exception as e:
+        st.error(f"Error calibrating SSVI slices: {e}")
 
 
-try:
-    main_fig = interpolation(tickr_, plot_data, IVT_data, logplot = logplot)
+    status.update(label='Interpolating surface...')
+    try:
+        main_fig = interpolation(tickr_, plot_data, IVT_data, logplot = logplot)
 
-except Exception as e:
-    st.error(f"Error interpolating 3D SSVI: {e}")
+    except Exception as e:
+        st.error(f"Error interpolating 3D SSVI: {e}")
 
+
+### PLOTTING ###
 
 if plot2D:
     for fig in figs:
