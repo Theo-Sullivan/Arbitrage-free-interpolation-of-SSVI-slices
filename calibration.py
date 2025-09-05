@@ -6,9 +6,7 @@
 # Imports
 import yfinance as yf
 import pandas as pd
-import matplotlib.pyplot as plt 
 import plotly.graph_objects as go
-from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 from scipy.optimize import minimize
 
