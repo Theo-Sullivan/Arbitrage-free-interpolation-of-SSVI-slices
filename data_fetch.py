@@ -189,7 +189,15 @@ def optchainData(optType_: str, tickr_: str, verbose = False):
     if (opt_chain0['bid'].fillna(0) == 0).all():
         raise Exception("No options are being traded")
 
-    return opt_chain0
+    safe_block = opt_chain0[
+    opt_chain0[['bid', 'ask']].notna().all(axis=1) &   # no NaNs
+    (opt_chain0[['bid', 'ask']] != 0).all(axis=1)     # no zeros
+    ].copy()
+
+    if safe_block.empty:
+        raise Exception("No valid option data after cleaning (all bids or asks are NaN/0)")
+
+    return safe_block
 
 
 
@@ -275,3 +283,4 @@ def impliedVolSurfaceData_eSSVI(optType_, tickr_, opt_chain, verbose=False, plot
 
 
     return IVT_data
+
