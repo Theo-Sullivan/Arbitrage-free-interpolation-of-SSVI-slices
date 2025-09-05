@@ -129,6 +129,10 @@ if plot2D:
 
 st.plotly_chart(main_fig)
 
+# LINKEDIN 
+st.write("---")
+st.markdown("Theo Sullivan | https://www.linkedin.com/in/theo-sullivan-4b41ba32a/")
+
 
 
 
