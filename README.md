@@ -10,7 +10,7 @@ This python project uses realtime Yahoo Finance data for a given ticker to calcu
 - **Data Fetching**: Uses Yahoo Finance (yfinance) to pull real-time option chain data
 - **IV Calculation**: Computes implied volatilities using Brent’s root-finding method
 - **Forward Estimation**: Estimates forward prices via robust regression (HuberRegressor) to enforce put–call parity
-- **Model Calibration**: Calibrates each maturity slice to the eSSVI model using constrained optimization (SciPy), based on [Zeliade Systems](https://zeliade.com/ssvi-paper.pdf)
+- **Model Calibration**: Calibrates each maturity slice to the eSSVI model using constrained optimization (SciPy), based on [Zeliade Systems](https://www.zeliade.com/wp-content/uploads/whitepapers/zwp-008-RobustNoArbSSVI.pdf)
 - **Parameter Interpolation**: Interpolates parameters across maturities to generate a smooth, arbitrage-free surface
 - **Visualization**: Creates interactive 2D and 3D plots with Plotly
 - **UI Controls**: Sidebar lets users customize ticker, option type, filters, and display settings
