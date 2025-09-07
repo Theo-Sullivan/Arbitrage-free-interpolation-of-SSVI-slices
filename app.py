@@ -84,7 +84,7 @@ tLimit = 0.1
 
 
 
-
+fig = []
 ### MAIN ###
 with st.status(label='Fetching option data...', expanded=False) as status:
     try:
