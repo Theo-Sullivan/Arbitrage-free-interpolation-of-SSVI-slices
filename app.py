@@ -84,9 +84,6 @@ tLimit = 0.1
 
 
 
-figs = []
-plot_data = ()
-main_fig = ()
 ### MAIN ###
 with st.status(label='Fetching option data...', expanded=False) as status:
     try:
@@ -123,17 +120,19 @@ with st.status(label='Fetching option data...', expanded=False) as status:
 
 
 ### PLOTTING ###
+try:
+    if plot2D:
+        for fig in figs:
+            st.plotly_chart(fig, use_container_width=True)
+        st.dataframe(plot_data)
 
-if plot2D:
-    for fig in figs:
-        st.plotly_chart(fig, use_container_width=True)
-    st.dataframe(plot_data)
+    st.plotly_chart(main_fig)
 
-st.plotly_chart(main_fig)
-
-# LINKEDIN 
-st.write("---")
-st.markdown("Theo Sullivan | https://www.linkedin.com/in/theo-sullivan-4b41ba32a/")
+    # LINKEDIN 
+    st.write("---")
+    st.markdown("Theo Sullivan | https://www.linkedin.com/in/theo-sullivan-4b41ba32a/")
+except:
+    raise Exception()
 
 
 
