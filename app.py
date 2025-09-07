@@ -91,6 +91,7 @@ with st.status(label='Fetching option data...', expanded=False) as status:
 
     except Exception as e:
         st.error(f"Error fetching option data: {e}")
+        st.stop()
 
     status.update(label='Computing implied volatility...')
     try:
@@ -98,6 +99,7 @@ with st.status(label='Fetching option data...', expanded=False) as status:
 
     except Exception as e:
         st.error(f"Error computing IV data: {e}")
+        st.stop()
 
 
     status.update(label='Calibrating parameters...')
@@ -109,7 +111,7 @@ with st.status(label='Fetching option data...', expanded=False) as status:
 
     except Exception as e:
         st.error(f"Error calibrating SSVI slices: {e}")
-
+        st.stop()
 
     status.update(label='Interpolating surface...')
     try:
@@ -117,7 +119,7 @@ with st.status(label='Fetching option data...', expanded=False) as status:
 
     except Exception as e:
         st.error(f"Error interpolating 3D SSVI: {e}")
-
+        st.stop()
 
     ### PLOTTING ###
     try:
@@ -128,12 +130,14 @@ with st.status(label='Fetching option data...', expanded=False) as status:
 
         st.plotly_chart(main_fig)
 
-        # LINKEDIN 
-        st.write("---")
-        st.markdown("Theo Sullivan | https://www.linkedin.com/in/theo-sullivan-4b41ba32a/")
     except:
-        raise Exception("No data to plot")
+        st.error("No data to plot")
+        st.stop()
 
+
+# LINKEDIN 
+st.write("---")
+st.markdown("Theo Sullivan | https://www.linkedin.com/in/theo-sullivan-4b41ba32a/")
 
 
 
