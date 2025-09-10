@@ -129,8 +129,9 @@ def linear_regression_F(tickr_, verbose=False, tLimit = 0):
         else:
             r = -np.log(D) / t_val
 
-        t_val_to_forward[t_val] = F
-        t_val_to_r[t_val] = r
+        key = round(t_val,5)
+        t_val_to_forward[key] = F
+        t_val_to_r[key] = r
 
     return t_val_to_forward, t_val_to_r
 
@@ -229,8 +230,9 @@ def impliedVolSurfaceData_eSSVI(optType_, tickr_, opt_chain, verbose=False, plot
         if ta > T: # Do T-Range here as otherwise dictionary will not have a value
             continue
 
-        F = t_val_to_forward[T]
-        r = t_val_to_r[T]
+        key = round(T,5)
+        F = t_val_to_forward[key]
+        r = t_val_to_r[key]
         bid = row['bid']
         ask = row['ask']
         volume = row['volume']
@@ -283,4 +285,5 @@ def impliedVolSurfaceData_eSSVI(optType_, tickr_, opt_chain, verbose=False, plot
 
 
     return IVT_data
+
 
