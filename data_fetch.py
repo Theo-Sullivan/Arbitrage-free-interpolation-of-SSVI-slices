@@ -235,9 +235,9 @@ def impliedVolSurfaceData_eSSVI(optType_, tickr_, opt_chain, verbose=False, plot
         r = t_val_to_r.get(key)
 
         # dict validation
-        if F is None or r is None:
+        if pd.isna(F) or pd.isna(r):
             if verbose:
-                print(f"skipping t = {t_val}")
+                print(f"skipping t = {key}")
             continue
         
         bid = row['bid']
@@ -292,6 +292,7 @@ def impliedVolSurfaceData_eSSVI(optType_, tickr_, opt_chain, verbose=False, plot
 
 
     return IVT_data
+
 
 
 
