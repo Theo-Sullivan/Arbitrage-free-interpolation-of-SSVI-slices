@@ -233,18 +233,19 @@ def impliedVolSurfaceData_eSSVI(optType_, tickr_, opt_chain, verbose=False, plot
         key = round(T,5)
         F = t_val_to_forward.get(key)
         r = t_val_to_r.get(key)
-        bid = row['bid']
-        ask = row['ask']
-        volume = row['volume']
-        midPrice = 0.5 * (bid + ask)
-        M = np.log(K/F)
-        
 
         # dict validation
         if F is None or r is None:
             if verbose:
                 print(f"skipping t = {t_val}")
             continue
+        
+        bid = row['bid']
+        ask = row['ask']
+        volume = row['volume']
+        midPrice = 0.5 * (bid + ask)
+        M = np.log(K/F)
+        
         
         # Bid-Ask Validation since bad data
         if (bid < 0.1 or ask < 0.1) and volume_filter: 
@@ -291,6 +292,7 @@ def impliedVolSurfaceData_eSSVI(optType_, tickr_, opt_chain, verbose=False, plot
 
 
     return IVT_data
+
 
 
 
