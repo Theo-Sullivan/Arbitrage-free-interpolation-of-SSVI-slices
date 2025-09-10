@@ -238,7 +238,7 @@ def impliedVolSurfaceData_eSSVI(optType_, tickr_, opt_chain, verbose=False, plot
         risk_free_rate = three_month_rate()
         if pd.isna(F) or pd.isna(r):
             r = risk_free_rate
-            F = S * np.exp(r*t_val)
+            F = S * np.exp(r*T)
         
         bid = row['bid']
         ask = row['ask']
@@ -292,6 +292,7 @@ def impliedVolSurfaceData_eSSVI(optType_, tickr_, opt_chain, verbose=False, plot
 
 
     return IVT_data
+
 
 
 
