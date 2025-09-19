@@ -233,6 +233,7 @@ def impliedVolSurfaceData_eSSVI(optType_, mergedOptChain, tickr_, opt_chain, ver
 
     # GETTING DATA
     S = yf.Ticker(tickr_).info['regularMarketPrice']
+    risk_free_rate = three_month_rate()
 
     t_val_to_forward, t_val_to_r = linear_regression_F(mergedOptChain, S, verbose = verbose)
     for idx, row in opt_chain.iterrows():        
@@ -247,7 +248,6 @@ def impliedVolSurfaceData_eSSVI(optType_, mergedOptChain, tickr_, opt_chain, ver
         r = t_val_to_r.get(key)
         
         # dict validation
-        risk_free_rate = three_month_rate()
         if pd.isna(F) or pd.isna(r):
             r = risk_free_rate
             F = S * np.exp(r*T)

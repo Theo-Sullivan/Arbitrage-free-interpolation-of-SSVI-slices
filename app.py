@@ -98,7 +98,7 @@ except Exception as e:
     st.error(f"{e}")  # now prints the cached function message cleanly
     st.stop()
 
-with st.status(label='Computing implied volatility...', expanded=False) as status:
+with st.status(label='Computing implied volatility...', expanded=True) as status:
     try:
         IVT_data = impliedVolSurfaceData_eSSVI(optType_, mergedOptchain, tickr_, opt_chain, plot_bidask = plot_bidask, verbose = verbose, volume_filter = volume_filter, oldmRange = (min_m, max_m), tLimit = 0.1)
 
