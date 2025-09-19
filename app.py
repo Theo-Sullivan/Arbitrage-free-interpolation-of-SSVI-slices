@@ -122,22 +122,23 @@ with st.status(label='Fetching option data...', expanded=False) as status:
         st.stop()
 
     ### PLOTTING ###
-    try:
-        if plot2D:
-            for fig in figs:
-                st.plotly_chart(fig, use_container_width=True)
-            st.dataframe(plot_data)
+try:
+    if plot2D:
+        for fig in figs:
+            st.plotly_chart(fig, use_container_width=True)
+        st.dataframe(plot_data)
 
-        st.plotly_chart(main_fig)
+    st.plotly_chart(main_fig)
 
-    except:
-        st.error("No data to plot")
-        st.stop()
+except:
+    st.error("No data to plot")
+    st.stop()
 
 
 # LINKEDIN 
 st.write("---")
 st.markdown("Theo Sullivan | https://www.linkedin.com/in/theo-sullivan-4b41ba32a/")
+
 
 
 

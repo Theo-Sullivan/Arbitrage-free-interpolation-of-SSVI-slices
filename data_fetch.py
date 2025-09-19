@@ -121,8 +121,9 @@ def linear_regression_F(mergedOptchain, S, verbose=False):
         else:
             r = -np.log(D) / t_val
 
-        t_val_to_forward[t_val] = F
-        t_val_to_r[t_val] = r
+        key = round(t_val,5)
+        t_val_to_forward[key] = F
+        t_val_to_r[key] = r
 
     return t_val_to_forward, t_val_to_r
 
@@ -241,14 +242,22 @@ def impliedVolSurfaceData_eSSVI(optType_, mergedOptChain, tickr_, opt_chain, ver
         if ta > T: # To avoid calculation error
             continue
 
-        F = t_val_to_forward[T]
-        r = t_val_to_r[T]
+        key = round(T,5)
+        F = t_val_to_forward.get(key)
+        r = t_val_to_r.get(key)
+        
+        # dict validation
+        risk_free_rate = three_month_rate()
+        if pd.isna(F) or pd.isna(r):
+            r = risk_free_rate
+            F = S * np.exp(r*T)
+        
         bid = row['bid']
         ask = row['ask']
         midPrice = 0.5 * (bid + ask)
         M = np.log(K/F)
         
-
+        
         # Bid-Ask Validation since bad data
         if (bid < 0.1 or ask < 0.1) and volume_filter: 
             if verbose:
@@ -295,4 +304,10 @@ def impliedVolSurfaceData_eSSVI(optType_, mergedOptChain, tickr_, opt_chain, ver
 
 
     return IVT_data
+
+
+
+
+
+
 
