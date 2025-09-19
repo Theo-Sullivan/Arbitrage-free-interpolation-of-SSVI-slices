@@ -89,7 +89,7 @@ def optchainData_cached(optType_, tickr_, verbose=False):
         return optchainData(optType_, tickr_, verbose)
     except Exception as e:
         st.error(f"Error fetchind data: {e}")
-        st.stop
+        st.stop()
 
 
 ### MAIN ###
@@ -97,7 +97,7 @@ with st.status(label='Fetching option data...', expanded=False) as status:
     opt_chain, mergedOptchain = optchainData_cached(optType_, tickr_, verbose)
     status.update(label='Computing implied volatility...')
 
-    
+
     try:
         IVT_data = impliedVolSurfaceData_eSSVI(optType_, mergedOptchain, tickr_, opt_chain, plot_bidask = plot_bidask, verbose = verbose, volume_filter = volume_filter, oldmRange = (min_m, max_m), tLimit = 0.1)
 
