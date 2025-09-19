@@ -95,21 +95,13 @@ def three_month_rate(default=0.041):
     
 
 # Finding forward rates using linear regression put call parity
-def linear_regression_F(tickr_, verbose=False, tLimit = 0):
-    optChainCalls = optchainData('call', tickr_, verbose=verbose)
-    optChainPuts  = optchainData('put',  tickr_, verbose=verbose)
-    mergedOptChain = pd.merge(optChainCalls, optChainPuts, on=["strike", "T"], how="inner")
-
+def linear_regression_F(mergedOptchain, S, verbose=False):
     t_val_to_forward = {}
     t_val_to_r = {}
 
-    S = yf.Ticker(tickr_).info['regularMarketPrice']
     risk_free_rate = three_month_rate()
 
-    for t_val, block in mergedOptChain.groupby("T"):
-        if tLimit > t_val:
-            continue
-
+    for t_val, block in mergedOptchain.groupby("T"):
         midPriceCalls = (block['bid_x'] + block['ask_x']) / 2
         midPricePuts  = (block['bid_y'] + block['ask_y']) / 2
         y = (midPriceCalls - midPricePuts).to_numpy()
@@ -135,12 +127,11 @@ def linear_regression_F(tickr_, verbose=False, tLimit = 0):
     return t_val_to_forward, t_val_to_r
 
 
-
 #FETCHING DATA // MAIN FUNCTIONS
 
 
-# Getting initial option chain
-def optchainData(optType_: str, tickr_: str, verbose = False):
+# Getting initial option chain for either call or put
+def optchain_get_either(optType_: str, tickr_: str, verbose = False):
     tickr = yf.Ticker(tickr_)
 
 
@@ -202,8 +193,30 @@ def optchainData(optType_: str, tickr_: str, verbose = False):
 
 
 
+
+
+
+# combine option chains for put and call
+def optchainData(optType_, tickr_, verbose):
+    calls = optchain_get_either('call', tickr_, verbose)
+    puts = optchain_get_either('put', tickr_, verbose)
+    
+    mergedOptchain = pd.merge(calls, puts, on=["strike", "T"], how="inner") 
+    common_keys = mergedOptchain[["strike", "T"]]
+
+    if optType_ == "call":
+        opt_chain = calls.merge(common_keys, on=["strike", "T"], how="inner")
+    else:
+        opt_chain = puts.merge(common_keys, on=["strike", "T"], how="inner")
+
+    return opt_chain, mergedOptchain
+
+
+
+
+
 # Validating data and creating new dataframe
-def impliedVolSurfaceData_eSSVI(optType_, tickr_, opt_chain, verbose=False, plot_bidask=False, volume_filter = False, oldmRange = (0.5,1.5), tLimit = 0):
+def impliedVolSurfaceData_eSSVI(optType_, mergedOptChain, tickr_, opt_chain, verbose=False, plot_bidask=False, volume_filter = False, oldmRange = (0.5,1.5), tLimit = 0):
     ivs = []
     logmoneyness = []
     dtes = []
@@ -220,20 +233,18 @@ def impliedVolSurfaceData_eSSVI(optType_, tickr_, opt_chain, verbose=False, plot
     # GETTING DATA
     S = yf.Ticker(tickr_).info['regularMarketPrice']
 
-    t_val_to_forward, t_val_to_r = linear_regression_F(tickr_, tLimit = tLimit, verbose = verbose)
-    for idx, row in opt_chain.iterrows():
-        
+    t_val_to_forward, t_val_to_r = linear_regression_F(mergedOptChain, S, verbose = verbose)
+    for idx, row in opt_chain.iterrows():        
         K = row["strike"]
         T = row["T"]
 
-        if ta > T: # Do T-Range here as otherwise dictionary will not have a value
+        if ta > T: # To avoid calculation error
             continue
 
         F = t_val_to_forward[T]
         r = t_val_to_r[T]
         bid = row['bid']
         ask = row['ask']
-        volume = row['volume']
         midPrice = 0.5 * (bid + ask)
         M = np.log(K/F)
         
@@ -270,6 +281,7 @@ def impliedVolSurfaceData_eSSVI(optType_, tickr_, opt_chain, verbose=False, plot
         ws.append(T*IV**2)
         bid_IVs.append(bid_IV)
         ask_IVs.append(ask_IV)
+
 
 
     IVT_data = pd.DataFrame({

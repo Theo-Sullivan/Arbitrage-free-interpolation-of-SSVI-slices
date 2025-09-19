@@ -87,7 +87,7 @@ tLimit = 0.1
 ### MAIN ###
 with st.status(label='Fetching option data...', expanded=False) as status:
     try:
-        opt_chain = optchainData(optType_, tickr_, verbose)
+        opt_chain, mergedOptchain = optchainData(optType_, tickr_, verbose)
 
     except Exception as e:
         st.error(f"Error fetching option data: {e}")
@@ -95,7 +95,7 @@ with st.status(label='Fetching option data...', expanded=False) as status:
 
     status.update(label='Computing implied volatility...')
     try:
-        IVT_data = impliedVolSurfaceData_eSSVI(optType_, tickr_, opt_chain, plot_bidask = plot_bidask, verbose = verbose, volume_filter = volume_filter, oldmRange = (min_m, max_m), tLimit = 0.1)
+        IVT_data = impliedVolSurfaceData_eSSVI(optType_, mergedOptchain, tickr_, opt_chain, plot_bidask = plot_bidask, verbose = verbose, volume_filter = volume_filter, oldmRange = (min_m, max_m), tLimit = 0.1)
 
     except Exception as e:
         st.error(f"Error computing IV data: {e}")
