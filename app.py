@@ -88,13 +88,16 @@ def optchainData_cached(optType_, tickr_, verbose=False):
     try:
         return optchainData(optType_, tickr_, verbose)
     except Exception as e:
-        st.error(f"Error fetchind data: {e}")
-        st.stop()
+        raise RuntimeError(f"Error fetching option data: {e}") from e
 
 
 ### MAIN ###
 with st.status(label='Fetching option data...', expanded=False) as status:
-    opt_chain, mergedOptchain = optchainData_cached(optType_, tickr_, verbose)
+    try:
+        opt_chain, mergedOptchain = optchainData_cached(optType_, tickr_, verbose)
+    except Exception as e:
+        st.error(f"{e}")  # now prints the cached function message cleanly
+        st.stop()
     status.update(label='Computing implied volatility...')
 
 
