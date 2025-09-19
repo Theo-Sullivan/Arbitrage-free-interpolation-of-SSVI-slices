@@ -82,16 +82,22 @@ if min_m>= max_m:
 verbose = False
 tLimit = 0.1
 
+### CACHING ####
+@st.cache_data(ttl=3600)
+def optchainData_cached(optType_, tickr_, verbose=False):
+    try:
+        return optchainData(optType_, tickr_, verbose)
+    except Exception as e:
+        raise
 
 
 ### MAIN ###
 with st.status(label='Fetching option data...', expanded=False) as status:
     try:
-        opt_chain, mergedOptchain = optchainData(optType_, tickr_, verbose)
-
+        opt_chain, mergedOptchain = optchainData_cached(optType_, tickr_, verbose)
     except Exception as e:
-        st.error(f"Error fetching option data: {e}")
-        st.stop()
+        st.error(f"Error fetching data: {e}")
+
 
     status.update(label='Computing implied volatility...')
     try:
@@ -122,23 +128,22 @@ with st.status(label='Fetching option data...', expanded=False) as status:
         st.stop()
 
     ### PLOTTING ###
-try:
-    if plot2D:
-        for fig in figs:
-            st.plotly_chart(fig, use_container_width=True)
-        st.dataframe(plot_data)
+    try:
+        if plot2D:
+            for fig in figs:
+                st.plotly_chart(fig, use_container_width=True)
+            st.dataframe(plot_data)
 
-    st.plotly_chart(main_fig)
+        st.plotly_chart(main_fig)
 
-except:
-    st.error("No data to plot")
-    st.stop()
+    except:
+        st.error("No data to plot")
+        st.stop()
 
 
 # LINKEDIN 
 st.write("---")
 st.markdown("Theo Sullivan | https://www.linkedin.com/in/theo-sullivan-4b41ba32a/")
-
 
 
 
