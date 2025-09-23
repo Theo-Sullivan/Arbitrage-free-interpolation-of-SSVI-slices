@@ -110,9 +110,9 @@ with st.status(label='Computing implied volatility...', expanded=True) as status
     status.update(label='Calibrating parameters...')
     try:
         if plot2D:  
-            plot_data, figs = SVI_model_2d_data(IVT_data, verbose = verbose, plot = plot2D, plot_bidask = plot_bidask, plot_IV = True)
+            plot_data, figs = SVI_model_2d_data(IVT_data, optType_ ,verbose = verbose, plot = plot2D, plot_bidask = plot_bidask, plot_IV = True)
         else:
-            plot_data = SVI_model_2d_data(IVT_data, verbose = verbose, plot = plot2D, plot_bidask = plot_bidask, plot_IV = True)
+            plot_data = SVI_model_2d_data(IVT_data, optType_, verbose = verbose, plot = plot2D, plot_bidask = plot_bidask, plot_IV = True)
 
     except Exception as e:
         st.error(f"Error calibrating SSVI slices: {e}")
@@ -143,6 +143,7 @@ with st.status(label='Computing implied volatility...', expanded=True) as status
 # LINKEDIN 
 st.write("---")
 st.markdown("Theo Sullivan | https://www.linkedin.com/in/theo-sullivan-4b41ba32a/")
+
 
 
 
