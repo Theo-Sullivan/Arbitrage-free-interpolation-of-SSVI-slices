@@ -141,7 +141,7 @@ def param_solver(IVT_datat, logmoneyness, ws, rho_prev, psi_prev, verbose = Fals
 
 
 # Using param_solver to calculate params then storing as table 
-def SVI_model_2d_data(IVT_data, plot_IV = True, plot_bidask = False, verbose = False, plot=True):
+def SVI_model_2d_data(IVT_data, optType_, plot_IV = True, plot_bidask = False, verbose = False, plot=True):
     # Data for table
     thetas = []
     rhos = []
@@ -163,7 +163,10 @@ def SVI_model_2d_data(IVT_data, plot_IV = True, plot_bidask = False, verbose = F
         ivs_for_graph = IVT_datat['ivs'].to_numpy()
 
         # Data for calibration
-        IVT_datat_calibration = IVT_datat[IVT_datat['logmoneyness'] >= 0]
+        if optType_ == 'call':
+            IVT_datat_calibration = IVT_datat[IVT_datat['logmoneyness'] >= 0]
+        else:
+            IVT_datat_calibration = IVT_datat[IVT_datat['logmoneyness'] <= 0]
 
         logmoneyness_for_calibration = IVT_datat_calibration['logmoneyness'].to_numpy()
         ws_for_calibration = IVT_datat_calibration['ws'].to_numpy()
@@ -389,4 +392,5 @@ def interpolation(tickr_, plot_data, IVT_data, logplot = False):
 
     # --- Show Plot ---
     return fig
+
 
