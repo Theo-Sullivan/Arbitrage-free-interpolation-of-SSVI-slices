@@ -20,7 +20,7 @@ st.sidebar.write('Adjust the parameters and viewing options for the SSVI model')
 st.sidebar.header('Ticker and Option Type')
 tickr_ = st.sidebar.text_input( # Choose Tickr
     'Enter Ticker Symbol',
-    value='SPY',
+    value='^SPX',
     max_chars=10
 ).upper()
 
@@ -143,6 +143,7 @@ with st.status(label='Computing implied volatility...', expanded=True) as status
 # LINKEDIN 
 st.write("---")
 st.markdown("Theo Sullivan | https://www.linkedin.com/in/theo-sullivan-4b41ba32a/")
+
 
 
 
