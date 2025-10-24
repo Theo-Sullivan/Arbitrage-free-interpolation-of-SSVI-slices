@@ -112,9 +112,9 @@ def linear_regression_F(mergedOptchain, S, verbose=False):
         slope = model.coef_[0]
         intercept = model.intercept_
 
-        F = intercept
         D = -slope
-
+        F = intercept/D
+        
         if not 0 < D <= 1: # This is of note
             r = risk_free_rate
             F = S * np.exp(r*t_val)
@@ -304,6 +304,7 @@ def impliedVolSurfaceData_eSSVI(optType_, mergedOptChain, tickr_, opt_chain, ver
 
 
     return IVT_data
+
 
 
 
