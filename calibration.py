@@ -382,7 +382,7 @@ def interpolation(tickr_, plot_data, IVT_data, logplot = False):
             yaxis_title="Time to Expiration",
             zaxis_title="Implied Volatility",
             xaxis=dict(
-                range=[min_bound_k, max_bound_k] if logplot else [np.exp(min_bound_k), np.exp(max_bound_k)]
+                range=[max_bound_k, min_bound_k] if logplot else [np.exp(max_bound_k), np.exp(min_bound_k)]
             ),
             yaxis=dict(range=[min_bound_t, max_bound_t]),
             camera=dict(eye=dict(x=1.2, y=1.2, z=0.8))  # sets the view angle
@@ -394,6 +394,7 @@ def interpolation(tickr_, plot_data, IVT_data, logplot = False):
 
     # --- Show Plot ---
     return fig
+
 
 
 
