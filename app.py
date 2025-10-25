@@ -50,7 +50,7 @@ plot_bidask = st.sidebar.checkbox('Plot Bid/Ask', value=False, disabled=not plot
 
 st.sidebar.header('Calibration Settings')
 volume_filter = st.sidebar.checkbox('Use Volume Filter', value=True) #volume 
-implied_yield = st.sidebar.checkbox('Use Implied Yields (Experimental)', value=True) # implied yields
+implied_yield = st.sidebar.checkbox('Use Implied Yields (Experimental)', value=False) # implied yields
 
 
 
