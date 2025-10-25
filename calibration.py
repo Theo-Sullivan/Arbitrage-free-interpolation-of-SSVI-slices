@@ -179,7 +179,10 @@ def SVI_model_2d_data(IVT_data, optType_, plot_IV = True, plot_bidask = False, v
 
         kStar, thetaStar = anchor_points(IVT_datat_calibration)
 
-        rho, psi, difference = param_solver(IVT_datat_calibration, logmoneyness_for_calibration, ws_for_calibration, rho_prev, psi_prev, verbose = verbose)
+        try:
+            rho, psi, difference = param_solver(IVT_datat_calibration, logmoneyness_for_calibration, ws_for_calibration, rho_prev, psi_prev, verbose = verbose)
+        except:
+            continue # We ignore this timeslice 
 
         rho_prev, psi_prev = rho, psi
 

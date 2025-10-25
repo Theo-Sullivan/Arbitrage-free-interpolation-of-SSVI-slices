@@ -50,6 +50,7 @@ plot_bidask = st.sidebar.checkbox('Plot Bid/Ask', value=False, disabled=not plot
 
 st.sidebar.header('Calibration Settings')
 volume_filter = st.sidebar.checkbox('Use Volume Filter', value=True) #volume 
+implied_yield = st.sidebar.checkbox('Use Implied Yields (Experimental)', value=True) # implied yields
 
 
 
@@ -67,7 +68,7 @@ max_m = st.sidebar.number_input(
     'Maximum Moneyness',
     min_value=1.1,
     max_value=2.0,
-    value=2.0,
+    value=1.5,
     step=0.01,
     format="%.1f"
 )
@@ -80,27 +81,28 @@ if min_m>= max_m:
 
 #Params for now!
 verbose = False
-tLimit = 0.1
+mRange = (min_m, max_m)
+tRange = (0.1,2)
 
 ### CACHING ####
 @st.cache_data(ttl=3600)
-def optchainData_cached(optType_, tickr_, verbose=False):
+def optchainData_cached(optType_, tickr_, verbose=False, mRange=mRange, tRange=tRange):
     try:
-        return optchainData(optType_, tickr_, verbose)
+        return optchainData(optType_, tickr_, verbose, mRange, tRange)
     except Exception as e:
         raise RuntimeError(f"Error fetching option data: {e}") from e
 
 
 ### MAIN ###
 try:
-    opt_chain, mergedOptchain = optchainData_cached(optType_, tickr_, verbose)
+    opt_chain, mergedOptchain = optchainData_cached(optType_, tickr_, verbose, mRange, tRange)
 except Exception as e:
     st.error(f"{e}")  # now prints the cached function message cleanly
     st.stop()
 
 with st.status(label='Computing implied volatility...', expanded=True) as status:
     try:
-        IVT_data = impliedVolSurfaceData_eSSVI(optType_, mergedOptchain, tickr_, opt_chain, plot_bidask = plot_bidask, verbose = verbose, volume_filter = volume_filter, oldmRange = (min_m, max_m), tLimit = 0.1)
+        IVT_data = impliedVolSurfaceData_eSSVI(optType_, mergedOptchain, tickr_, opt_chain, plot_bidask = plot_bidask, verbose = verbose, volume_filter = volume_filter, implied_yield = implied_yield)
 
     except Exception as e:
         st.error(f"Error computing IV data: {e}")

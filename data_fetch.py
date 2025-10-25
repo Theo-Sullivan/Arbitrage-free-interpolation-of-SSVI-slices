@@ -104,17 +104,20 @@ def linear_regression_F(mergedOptchain, S, verbose=False):
     for t_val, block in mergedOptchain.groupby("T"):
         midPriceCalls = (block['bid_x'] + block['ask_x']) / 2
         midPricePuts  = (block['bid_y'] + block['ask_y']) / 2
-        y = (midPriceCalls - midPricePuts).to_numpy()
+        Y = (midPriceCalls - midPricePuts).to_numpy()
         X = block['strike'].to_numpy().reshape(-1, 1)
 
+        X_scaled = X/S
+        Y_scaled = Y/S
+
         # Robust regression
-        model = HuberRegressor().fit(X, y)
+        model = HuberRegressor(max_iter=500).fit(X_scaled, Y_scaled)
         slope = model.coef_[0]
-        intercept = model.intercept_
+        intercept = model.intercept_ * S
 
         D = -slope
-        F = intercept/D
-        
+        F = intercept/(D)
+
         if not 0 < D <= 1: # This is of note
             r = risk_free_rate
             F = S * np.exp(r*t_val)
@@ -132,9 +135,12 @@ def linear_regression_F(mergedOptchain, S, verbose=False):
 
 
 # Getting initial option chain for either call or put
-def optchain_get_either(optType_: str, tickr_: str, verbose = False):
+def optchain_get_either(optType_: str, tickr_: str, verbose = False, mRange = (0.6,1.4), tRange = (0.1,2)):
     tickr = yf.Ticker(tickr_)
+    S = yf.Ticker(tickr_).info['regularMarketPrice']
 
+    ma,mb = mRange
+    ta,tb = tRange
 
     # Fetching Options Error Checking
     try:
@@ -180,6 +186,8 @@ def optchain_get_either(optType_: str, tickr_: str, verbose = False):
     # Validating data
     if (opt_chain0['bid'].fillna(0) == 0).all():
         raise Exception("No options are being traded")
+    
+    opt_chain0 = opt_chain0[(opt_chain0["strike"].between(ma * S, mb * S)) & (opt_chain0["T"].between(ta, tb))]
 
     safe_block = opt_chain0[
     opt_chain0[['bid', 'ask']].notna().all(axis=1) &   # no NaNs
@@ -198,9 +206,9 @@ def optchain_get_either(optType_: str, tickr_: str, verbose = False):
 
 
 # combine option chains for put and call
-def optchainData(optType_, tickr_, verbose):
-    calls = optchain_get_either('call', tickr_, verbose)
-    puts = optchain_get_either('put', tickr_, verbose)
+def optchainData(optType_, tickr_, verbose, mRange, tRange):
+    calls = optchain_get_either('call', tickr_, verbose, mRange, tRange)
+    puts = optchain_get_either('put', tickr_, verbose, mRange, tRange)
     
     mergedOptchain = pd.merge(calls, puts, on=["strike", "T"], how="inner") 
     common_keys = mergedOptchain[["strike", "T"]]
@@ -217,7 +225,7 @@ def optchainData(optType_, tickr_, verbose):
 
 
 # Validating data and creating new dataframe
-def impliedVolSurfaceData_eSSVI(optType_, mergedOptChain, tickr_, opt_chain, verbose=False, plot_bidask=False, volume_filter = False, oldmRange = (0.5,1.5), tLimit = 0):
+def impliedVolSurfaceData_eSSVI(optType_, mergedOptChain, tickr_, opt_chain, verbose=False, plot_bidask=False, volume_filter = False, implied_yield = False):
     ivs = []
     logmoneyness = []
     dtes = []
@@ -228,24 +236,24 @@ def impliedVolSurfaceData_eSSVI(optType_, mergedOptChain, tickr_, opt_chain, ver
     bid_IV = np.nan
     ask_IV = np.nan
 
-    ma, mb = oldmRange
-    ta = tLimit
-
     # GETTING DATA
     S = yf.Ticker(tickr_).info['regularMarketPrice']
     risk_free_rate = three_month_rate()
 
-    t_val_to_forward, t_val_to_r = linear_regression_F(mergedOptChain, S, verbose = verbose)
+    if implied_yield:
+        t_val_to_forward, t_val_to_r = linear_regression_F(mergedOptChain, S, verbose = verbose)
+
     for idx, row in opt_chain.iterrows():        
         K = row["strike"]
         T = row["T"]
 
-        if ta > T: # To avoid calculation error
-            continue
-
-        key = round(T,5)
-        F = t_val_to_forward.get(key)
-        r = t_val_to_r.get(key)
+        if implied_yield:
+            key = round(T,5)
+            F = t_val_to_forward.get(key)
+            r = t_val_to_r.get(key)
+        else:
+            r = risk_free_rate
+            F = S * np.exp(T * r)
         
         # dict validation
         if pd.isna(F) or pd.isna(r):
@@ -262,10 +270,6 @@ def impliedVolSurfaceData_eSSVI(optType_, mergedOptChain, tickr_, opt_chain, ver
         if (bid < 0.1 or ask < 0.1) and volume_filter: 
             if verbose:
                 print("Removed data point due to low bid, ask or liquidity")
-            continue
-
-        # mRange - in the old way for continuity with old graph
-        if not ma <= S/K <= mb:
             continue
 
         
