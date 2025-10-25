@@ -99,34 +99,29 @@ def linear_regression_F(mergedOptchain, S, verbose=False):
     t_val_to_forward = {}
     t_val_to_r = {}
 
-    risk_free_rate = three_month_rate()
-
     for t_val, block in mergedOptchain.groupby("T"):
         midPriceCalls = (block['bid_x'] + block['ask_x']) / 2
         midPricePuts  = (block['bid_y'] + block['ask_y']) / 2
-        Y = (midPriceCalls - midPricePuts).to_numpy()
-        X = block['strike'].to_numpy().reshape(-1, 1)
 
-        X_scaled = X/S
-        Y_scaled = Y/S
+        spread = midPriceCalls-midPricePuts
+        Y = (spread).to_numpy()
 
-        # Robust regression
-        model = HuberRegressor(max_iter=500).fit(X_scaled, Y_scaled)
-        slope = model.coef_[0]
-        intercept = model.intercept_ * S
+        min_idx = spread.abs().idxmin()
 
-        D = -slope
-        F = intercept/(D)
-
-        if not 0 < D <= 1: # This is of note
-            r = risk_free_rate
-            F = S * np.exp(r*t_val)
-        else:
-            r = -np.log(D) / t_val
+        min_strike = block.loc[min_idx, "strike"]
+        min_spread = spread.loc[min_idx]
+        
+        r = -np.log((S -min_spread)/min_strike)/t_val
+        F = S * np.exp(r*t_val)
 
         key = round(t_val,5)
         t_val_to_forward[key] = F
         t_val_to_r[key] = r
+
+        if verbose:
+            import matplotlib.pyplot as plt
+            plt.plot(block['strike'],Y, 'o')
+            plt.show()
 
     return t_val_to_forward, t_val_to_r
 
@@ -312,6 +307,33 @@ def impliedVolSurfaceData_eSSVI(optType_, mergedOptChain, tickr_, opt_chain, ver
 
 
 
+
+
+
+
+if __name__ == "__main__": # TEST SUITE!
+    import matplotlib.pyplot as plt
+    opt_chain, mergedOptchain = optchainData("call", "SPY", True, (0.8,1.2), (0.1,2))
+    S = yf.Ticker("SPY").info['regularMarketPrice']
+    print("------------------------------------------")
+    f_dic, r_dic = linear_regression_F(mergedOptchain, S, verbose = True)
+    print(S)
+    print("----------------")
+    print(f_dic)
+    print("---------------")
+    print(r_dic)
+
+    t_vals = list(f_dic.keys())
+    f_vals = list(f_dic.values())
+    r_vals = list(r_dic.values())
+
+    plt.plot(t_vals, f_vals)
+    plt.plot(t_vals, f_vals, 'o')
+    plt.show()
+    
+    plt.plot(t_vals, r_vals)
+    plt.plot(t_vals, r_vals, 'o')
+    plt.show()
 
 
 
