@@ -164,9 +164,9 @@ def SVI_model_2d_data(IVT_data, optType_, plot_IV = True, plot_bidask = False, v
 
         # Data for calibration
         if optType_ == 'call':
-            IVT_datat_calibration = IVT_datat[IVT_datat['logmoneyness'] >= -0.1]
+            IVT_datat_calibration = IVT_datat[IVT_datat['logmoneyness'] >= 0]
         else:
-            IVT_datat_calibration = IVT_datat[IVT_datat['logmoneyness'] <= 0.1]
+            IVT_datat_calibration = IVT_datat[IVT_datat['logmoneyness'] <= 0]
 
         logmoneyness_for_calibration = IVT_datat_calibration['logmoneyness'].to_numpy()
         ws_for_calibration = IVT_datat_calibration['ws'].to_numpy()
@@ -369,8 +369,7 @@ def interpolation(tickr_, plot_data, IVT_data, logplot = False):
         x_label = 'Log Moneyness (log(Strike / Forward))' 
     else:  
         X_axis = np.exp(K)  
-        X_axis = (1 / X_axis) 
-        x_label = 'Moneyness (Forward / Strike)'  
+        x_label = 'Moneyness (Strike / Forward)'  
 
     # Surface
     fig = go.Figure(data=[go.Surface(x=X_axis, y=T, z=IV, colorscale="Viridis", opacity=0.8)])
@@ -383,7 +382,7 @@ def interpolation(tickr_, plot_data, IVT_data, logplot = False):
             yaxis_title="Time to Expiration",
             zaxis_title="Implied Volatility",
             xaxis=dict(
-                range=[min_bound_k, max_bound_k] if logplot else [1 / np.exp(min_bound_k), 1 / np.exp(max_bound_k)]
+                range=[min_bound_k, max_bound_k] if logplot else [np.exp(min_bound_k), np.exp(max_bound_k)]
             ),
             yaxis=dict(range=[min_bound_t, max_bound_t]),
             camera=dict(eye=dict(x=1.2, y=1.2, z=0.8))  # sets the view angle
@@ -395,5 +394,8 @@ def interpolation(tickr_, plot_data, IVT_data, logplot = False):
 
     # --- Show Plot ---
     return fig
+
+
+
 
 
