@@ -191,7 +191,7 @@ def optchain_get_either(optType_: str, tickr_: str,S, verbose = False, mRange = 
     if safe_block.empty:
         raise Exception("No valid option data after cleaning (all bids or asks are NaN/0)")
 
-    return safe_block, S
+    return safe_block
 
 
 
@@ -213,7 +213,7 @@ def optchainData(optType_, tickr_, verbose, mRange, tRange):
     else:
         opt_chain = puts.merge(common_keys, on=["strike", "T"], how="inner")
 
-    return opt_chain, mergedOptchain
+    return opt_chain, mergedOptchain, S
 
 
 
@@ -333,6 +333,7 @@ if __name__ == "__main__": # TEST SUITE!
     plt.plot(t_vals, r_vals)
     plt.plot(t_vals, r_vals, 'o')
     plt.show()
+
 
 
 
