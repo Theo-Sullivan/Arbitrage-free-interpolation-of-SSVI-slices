@@ -132,7 +132,7 @@ def linear_regression_F(mergedOptchain, S, verbose=False):
 # Getting initial option chain for either call or put
 def optchain_get_either(optType_: str, tickr_: str, verbose = False, mRange = (0.6,1.4), tRange = (0.1,2)):
     tickr = yf.Ticker(tickr_)
-    S = yf.Ticker(tickr_).info['regularMarketPrice']
+    S = yf.Ticker(tickr_).history(period="1d")["Close"].iloc[-1]
 
     ma,mb = mRange
     ta,tb = tRange
@@ -232,7 +232,7 @@ def impliedVolSurfaceData_eSSVI(optType_, mergedOptChain, tickr_, opt_chain, ver
     ask_IV = np.nan
 
     # GETTING DATA
-    S = yf.Ticker(tickr_).info['regularMarketPrice']
+    S = yf.Ticker(tickr_).history(period="1d")["Close"].iloc[-1]
     risk_free_rate = three_month_rate()
 
     if implied_yield:
@@ -334,6 +334,7 @@ if __name__ == "__main__": # TEST SUITE!
     plt.plot(t_vals, r_vals)
     plt.plot(t_vals, r_vals, 'o')
     plt.show()
+
 
 
 
