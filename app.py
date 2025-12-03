@@ -95,14 +95,14 @@ def optchainData_cached(optType_, tickr_, verbose=False, mRange=mRange, tRange=t
 
 ### MAIN ###
 try:
-    opt_chain, mergedOptchain = optchainData_cached(optType_, tickr_, verbose, mRange, tRange)
+    opt_chain, mergedOptchain, S = optchainData_cached(optType_, tickr_, verbose, mRange, tRange)
 except Exception as e:
     st.error(f"{e}")  # now prints the cached function message cleanly
     st.stop()
 
 with st.status(label='Computing implied volatility...', expanded=True) as status:
     try:
-        IVT_data = impliedVolSurfaceData_eSSVI(optType_, mergedOptchain, tickr_, opt_chain, plot_bidask = plot_bidask, verbose = verbose, volume_filter = volume_filter, implied_yield = implied_yield)
+        IVT_data = impliedVolSurfaceData_eSSVI(optType_, mergedOptchain, tickr_, opt_chain, S, plot_bidask = plot_bidask, verbose = verbose, volume_filter = volume_filter, implied_yield = implied_yield)
 
     except Exception as e:
         st.error(f"Error computing IV data: {e}")
