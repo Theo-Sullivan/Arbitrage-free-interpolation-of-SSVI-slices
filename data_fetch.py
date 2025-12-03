@@ -130,9 +130,8 @@ def linear_regression_F(mergedOptchain, S, verbose=False):
 
 
 # Getting initial option chain for either call or put
-def optchain_get_either(optType_: str, tickr_: str, verbose = False, mRange = (0.6,1.4), tRange = (0.1,2)):
+def optchain_get_either(optType_: str, tickr_: str,S, verbose = False, mRange = (0.6,1.4), tRange = (0.1,2)):
     tickr = yf.Ticker(tickr_)
-    S = yf.Ticker(tickr_).history(period="1d")["Close"].iloc[-1]
 
     ma,mb = mRange
     ta,tb = tRange
@@ -192,7 +191,7 @@ def optchain_get_either(optType_: str, tickr_: str, verbose = False, mRange = (0
     if safe_block.empty:
         raise Exception("No valid option data after cleaning (all bids or asks are NaN/0)")
 
-    return safe_block
+    return safe_block, S
 
 
 
@@ -202,8 +201,9 @@ def optchain_get_either(optType_: str, tickr_: str, verbose = False, mRange = (0
 
 # combine option chains for put and call
 def optchainData(optType_, tickr_, verbose, mRange, tRange):
-    calls = optchain_get_either('call', tickr_, verbose, mRange, tRange)
-    puts = optchain_get_either('put', tickr_, verbose, mRange, tRange)
+    S = yf.Ticker(tickr_).history(period="1d")["Close"].iloc[-1]
+    calls = optchain_get_either('call', tickr_, S,verbose, mRange, tRange)
+    puts = optchain_get_either('put', tickr_, S,verbose, mRange, tRange)
     
     mergedOptchain = pd.merge(calls, puts, on=["strike", "T"], how="inner") 
     common_keys = mergedOptchain[["strike", "T"]]
@@ -220,7 +220,7 @@ def optchainData(optType_, tickr_, verbose, mRange, tRange):
 
 
 # Validating data and creating new dataframe
-def impliedVolSurfaceData_eSSVI(optType_, mergedOptChain, tickr_, opt_chain, verbose=False, plot_bidask=False, volume_filter = False, implied_yield = False):
+def impliedVolSurfaceData_eSSVI(optType_, mergedOptChain, tickr_, opt_chain, S, verbose=False, plot_bidask=False, volume_filter = False, implied_yield = False):
     ivs = []
     logmoneyness = []
     dtes = []
@@ -232,7 +232,6 @@ def impliedVolSurfaceData_eSSVI(optType_, mergedOptChain, tickr_, opt_chain, ver
     ask_IV = np.nan
 
     # GETTING DATA
-    S = yf.Ticker(tickr_).history(period="1d")["Close"].iloc[-1]
     risk_free_rate = three_month_rate()
 
     if implied_yield:
@@ -334,6 +333,7 @@ if __name__ == "__main__": # TEST SUITE!
     plt.plot(t_vals, r_vals)
     plt.plot(t_vals, r_vals, 'o')
     plt.show()
+
 
 
 
