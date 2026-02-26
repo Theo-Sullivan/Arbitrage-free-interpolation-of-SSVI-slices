@@ -126,6 +126,7 @@ with st.status(label='Computing implied volatility...', expanded=True) as status
 
     except Exception as e:
         st.error(f"Error interpolating 3D SSVI: {e}")
+        st.stop()
 
     ### PLOTTING ###
     try:
