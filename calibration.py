@@ -338,19 +338,11 @@ def interpolation(tickr_, plot_data, IVT_data, logplot = False):
         return np.interp(x, t_vals, rhos * psis) / psi_eq(x)
     
     # Finding mins, maxs
-    min_bound_k = 0
-    max_bound_k = 0
+    IVT_data = IVT_data[IVT_data["dtes"].isin(t_vals)]
 
-    for t_val, IVT_datat in IVT_data.groupby("dtes"):
-        min_k = min(IVT_datat['logmoneyness'])
-        max_k = max(IVT_datat['logmoneyness'])
-
-        if min_bound_k > min_k:
-            min_bound_k = min_k
-
-        if max_bound_k < max_k:
-            max_bound_k = max_k
-
+    min_bound_k = IVT_data["logmoneyness"].min()
+    max_bound_k = IVT_data["logmoneyness"].max()
+    
     
     # Creating meshgrid
     epsilon = 0.01
@@ -400,6 +392,7 @@ def interpolation(tickr_, plot_data, IVT_data, logplot = False):
 
     # --- Show Plot ---
     return fig
+
 
 
 
