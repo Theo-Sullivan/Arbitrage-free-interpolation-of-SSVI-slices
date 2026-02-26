@@ -126,7 +126,6 @@ with st.status(label='Computing implied volatility...', expanded=True) as status
 
     except Exception as e:
         st.error(f"Error interpolating 3D SSVI: {e}")
-        st.stop()
 
     ### PLOTTING ###
     try:
@@ -145,6 +144,7 @@ with st.status(label='Computing implied volatility...', expanded=True) as status
 # LINKEDIN 
 st.write("---")
 st.markdown("Theo Sullivan | https://www.linkedin.com/in/theo-sullivan-4b41ba32a/")
+
 
 
 
