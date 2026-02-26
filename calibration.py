@@ -171,7 +171,7 @@ def SVI_model_2d_data(IVT_data, optType_, plot_IV = True, plot_bidask = False, v
         except:
             continue
 
-        if len(IVT_datat_calibration) < 10:
+        if len(IVT_datat_calibration) < 5:
             continue
 
         logmoneyness_for_calibration = IVT_datat_calibration['logmoneyness'].to_numpy()
@@ -392,6 +392,7 @@ def interpolation(tickr_, plot_data, IVT_data, logplot = False):
 
     # --- Show Plot ---
     return fig
+
 
 
 
